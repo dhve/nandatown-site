@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>NANDA Town</title>
-<meta name="description" content="NANDA Town is the open-source proving ground for agent protocols. Test the path, not just the protocol: agents earn replayable evidence in a town that plants faults on purpose." />
+<meta name="description" content="NANDA Town is an open-source testbed for AI agent protocols. It runs agents through simulated and live scenarios, creates failures on purpose, and writes replayable evidence for every run." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23F2C400'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial' font-size='34' font-weight='700' text-anchor='middle' fill='%230E0E0E'%3ENT%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -273,7 +273,7 @@ section.block { padding: 72px 0 8px; }
 <header class="topbar">
   <div class="brand">
     <a href="#" class="brand-link">NANDA <strong>Town</strong></a>
-    <span class="tag">Project NANDA · Agent Testbed</span>
+    <span class="tag">Project NANDA agent testbed</span>
   </div>
   <nav class="navlinks">
     <a href="#tiers">Three rooms</a>
@@ -288,13 +288,14 @@ section.block { padding: 72px 0 8px; }
 <main>
 
 <section class="hero">
-  <p class="kicker">Open-source proving ground for agent protocols</p>
+  <p class="kicker">An open-source testbed for agent protocols</p>
   <h1>Test the <span class="mark">path</span>, not just the protocol.</h1>
   <p class="lede">
-    A protocol spec tells you what agents promised. NANDA Town watches what they actually do.
-    Drop any agent into a small town that plants faults on purpose: crashed sellers, duplicate
-    deliveries, drifting agent cards, truncated context. The agent either survives with
-    replayable evidence, or it fails in a way you can rerun with one command.
+    A protocol spec says what an agent should do. NANDA Town records what the agent actually
+    does. You drop an agent into a small simulated town, and the town creates failures on
+    purpose, e.g., a crashed seller, a duplicate delivery, a changed agent card, or a truncated
+    context. Every run writes evidence you can replay, and every failure prints the exact
+    command that reruns it.
   </p>
   <div class="cta-row">
     <a class="btn btn-solid" href="https://github.com/projnanda/nandatown">View on GitHub</a>
@@ -321,45 +322,45 @@ section.block { padding: 72px 0 8px; }
   <div class="term">
     <div class="term-head">
       <span class="dot"></span><span class="dot"></span><span class="dot y"></span>
-      <span class="title">nandatown · interactive CLI</span>
+      <span class="title">nandatown interactive CLI</span>
     </div>
     <div class="term-body" id="term-body"></div>
   </div>
 </section>
 
 <section class="block reveal" id="tiers">
-  <p class="kicker">Three rooms, one bar</p>
-  <h2>Every claim is tested where it can actually break.</h2>
+  <p class="kicker">Three test tiers</p>
+  <h2>The same test runs at three levels of realism.</h2>
   <p class="sub">
-    Start deterministic, end live. The same evidence format and the same verdicts hold in
-    all three rooms, so a pass means the same thing wherever it was earned.
+    Runs start deterministic and end live. Every tier uses the same evidence format and the
+    same verdicts, so a pass means the same thing at every tier.
   </p>
   <div class="tiers">
     <div class="tier">
       <span class="no">01</span>
       <h3>The Lab</h3>
       <div class="what">Deterministic simulation</div>
-      <p>A seeded discrete-event sim of the whole town. Auctions, voting, consensus, supply
-      chains, capability spoofing. Same seed, same story, every time, so a regression is a
-      diff and not a debate.</p>
+      <p>A seeded simulation of the whole town covers auctions, voting, consensus, supply
+      chains, and capability spoofing. The same seed produces the same run every time, so
+      you can find a regression by diffing two runs.</p>
       <p><code>nandatown run marketplace</code></p>
     </div>
     <div class="tier">
       <span class="no">02</span>
       <h3>The Track</h3>
-      <div class="what">Real processes, real failures</div>
-      <p>Actual subprocess agents talking over HTTP through a durable mailbox: leases,
-      fencing tokens, at-least-once delivery. The town kills a seller mid-run and checks
-      that the deal still closes exactly once.</p>
+      <div class="what">Real processes and crashes</div>
+      <p>Real agent processes talk over HTTP through a durable mailbox with leases, fencing
+      tokens, and at-least-once delivery. The town kills a seller mid-run and checks that
+      the deal still closes exactly once.</p>
       <p><code>nandatown run quote-crash-restart</code></p>
     </div>
     <div class="tier">
       <span class="no">03</span>
       <h3>The Path</h3>
-      <div class="what">Live agents on the open web</div>
-      <p>Point the town at any A2A agent by URL. It reads the agent card, invokes the
-      capability, replays the request to catch double-fulfillment, and grades against a
-      versioned path profile.</p>
+      <div class="what">Live agents by URL</div>
+      <p>You point the town at any A2A agent by URL. The town reads the agent card and
+      invokes the capability. It then repeats the request to check that the agent does not
+      fulfill the order twice, and it grades everything against a versioned path profile.</p>
       <p><code>nandatown test-agent --url ...</code></p>
     </div>
   </div>
@@ -369,38 +370,40 @@ section.block { padding: 72px 0 8px; }
   <p class="kicker">The town is modular</p>
   <h2>Twelve replaceable protocol layers.</h2>
   <p class="sub">
-    Every interaction in the town passes through these layers. Each ships with a working
-    default plugin, and any scenario can swap any layer for a registered alternative.
-    Found a failure that fits no layer? Propose a thirteenth.
+    Every interaction in the town passes through these layers. Each layer ships with a
+    working default plugin, and any scenario can swap any layer for a registered
+    alternative. If you find a failure that fits no layer, you can propose a new layer.
   </p>
   <div class="layer-grid" id="layer-grid"></div>
   <p class="layer-note">
-    Plugins register with a one-line decorator and resolve by name at runtime, so testing a
-    new registry design or a different trust model is a plugin, not a fork.
+    Plugins register with a one-line decorator and resolve by name at runtime, so you can
+    test a new registry design or a different trust model by writing a plugin instead of
+    forking the town.
   </p>
 </section>
 
 <section class="block reveal" id="evidence">
-  <p class="kicker">Evidence over vibes</p>
-  <h2>Verdicts you can replay, not screenshots you must trust.</h2>
+  <p class="kicker">Replayable evidence</p>
+  <h2>Every verdict comes with evidence you can replay.</h2>
   <div class="verdicts">
     <span class="pill ok">PASSED</span>
     <span class="pill bad">FAILED</span>
     <span class="pill inc">INCONCLUSIVE</span>
     <span class="pill na">NOT TESTED</span>
-    <span class="pill err">ERROR · the town's fault, never yours</span>
+    <span class="pill err">ERROR means the town broke, not your agent</span>
   </div>
   <div class="split">
     <div class="prose">
-      <p>Every run writes a content-addressed <strong>evidence bundle</strong>. Validators judge
-      from recorded events alone, never from an agent's self-report. If evidence is missing the
-      verdict is Inconclusive, because absence of proof is not a pass.</p>
-      <p>When something breaks, the result names the <strong>first broken stage</strong>, marks
-      everything downstream as unreached instead of failed, and prints the exact command that
-      reruns that stage.</p>
-      <p>Anyone can check a bundle without trusting the person who sent it:
-      <code>nandatown verify &lt;bundle&gt;</code> recomputes every hash and re-judges every stage
-      from the raw events.</p>
+      <p>Every run writes an <strong>evidence bundle</strong>, and a manifest stores a hash of
+      every file, so any edit to the evidence is detectable. Validators judge from recorded
+      events alone, never from an agent's self-report. If evidence is missing, the verdict is
+      Inconclusive, because missing evidence is not a pass.</p>
+      <p>When something breaks, the result names the <strong>first broken stage</strong> and
+      marks everything after it as unreached instead of failed. The result also prints the
+      exact command that reruns the broken stage.</p>
+      <p>Anyone can check a bundle without trusting the person who sent it. The command
+      <code>nandatown verify &lt;bundle&gt;</code> recomputes every hash and re-judges every
+      stage from the raw events.</p>
     </div>
     <div class="filetree">
 <span class="d">runs/2026-08-28T14-02-11_marketplace/</span>
@@ -416,11 +419,12 @@ section.block { padding: 72px 0 8px; }
 
 <section class="block reveal" id="proof">
   <p class="kicker">A badge that expires</p>
-  <h2>TOWN-TESTED means something, briefly.</h2>
+  <h2>The TOWN-TESTED badge is narrow, and it expires.</h2>
   <p class="sub">
-    Passing runs mint an Ed25519-signed receipt, sanitized of business data. The badge renders
-    only while the evidence is fresh, the signature checks out, and the coverage is honest.
-    Commitment is not truth, so the proof stays narrow and expiring by design.
+    A passing run produces a receipt signed with an Ed25519 key, with business data removed.
+    The badge renders only while the evidence is fresh, the signature verifies, and the
+    coverage list is complete. The badge claims that one capability passed one profile at
+    one point in time, and nothing more.
   </p>
   <div class="proof-card">
     <span class="badge">TOWN-TESTED</span>
@@ -437,13 +441,13 @@ section.block { padding: 72px 0 8px; }
 </section>
 
 <section class="block reveal" id="start">
-  <p class="kicker">Five minutes to first verdict</p>
+  <p class="kicker">Install and run</p>
   <h2>Get started.</h2>
   <div class="steps">
     <div class="step">
       <div>
         <h4>Clone and install</h4>
-        <p>Python 3.11 or newer. Everything runs locally, no accounts, no cloud.</p>
+        <p>You need Python 3.11 or newer. Everything runs locally, and there are no accounts.</p>
         <div class="codebox"><button class="copy">Copy</button>git clone https://github.com/projnanda/nandatown
 cd nandatown &amp;&amp; python -m venv .venv &amp;&amp; source .venv/bin/activate
 pip install -e ".[dev]"</div>
@@ -452,14 +456,14 @@ pip install -e ".[dev]"</div>
     <div class="step">
       <div>
         <h4>Open the town</h4>
-        <p>An interactive GUI in your terminal, or add <code>--web</code> to serve it in a browser.</p>
+        <p>The command opens an interactive GUI in your terminal. Add <code>--web</code> to serve the same GUI in a browser.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown ui</div>
       </div>
     </div>
     <div class="step">
       <div>
-        <h4>Run a scenario, break an agent</h4>
-        <p>Watch the marketplace close deals, then crash the seller and watch it recover.</p>
+        <h4>Run the scenarios</h4>
+        <p>The first run closes marketplace deals. The second crashes the seller mid-deal and checks the recovery.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown run marketplace
 nandatown run quote-crash-restart</div>
       </div>
@@ -467,7 +471,7 @@ nandatown run quote-crash-restart</div>
     <div class="step">
       <div>
         <h4>Test a live agent</h4>
-        <p>Any A2A agent with an agent card. Try it against the town's own defective demo agent first.</p>
+        <p>The command tests any A2A agent that serves an agent card. You can try it first against the town's own demo agent, which has a planted defect.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown a2a serve --defect wrong_total &amp;
 nandatown test-agent --url http://127.0.0.1:8710</div>
       </div>
@@ -476,29 +480,29 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
 </section>
 
 <section class="block reveal" id="bring">
-  <p class="kicker">Bring your own everything</p>
-  <h2>Made to be connected to.</h2>
+  <p class="kicker">Connect your own work</p>
+  <h2>Connect an agent, a protocol, or a service.</h2>
   <div class="bring">
     <div class="tier">
       <h3>Bring your agent</h3>
       <div class="what">Any harness</div>
-      <p>Point the LLM harness at any OpenAI-compatible endpoint or a local Ollama model, or use
-      the deterministic MockBrain. The town injects context truncation and tool errors to see
-      what your agent does when the world misbehaves.</p>
+      <p>You point the LLM harness at any OpenAI-compatible endpoint or a local Ollama model,
+      or you use the deterministic MockBrain. The town injects context truncation and tool
+      errors to see what your agent does when a tool call fails or its context gets cut.</p>
     </div>
     <div class="tier">
       <h3>Bring your protocol</h3>
       <div class="what">Straight from a PR</div>
-      <p>Working on a NANDA protocol? <code>nandatown import-pr</code> pulls a pull request from
-      the nandatown repo, scans it, and registers it as a layer plugin so it can be exercised
-      against every scenario before it merges.</p>
+      <p>The command <code>nandatown import-pr</code> pulls a pull request from the nandatown
+      repo, scans it for secrets, and registers it as a layer plugin. Every scenario can then
+      exercise the protocol before it merges.</p>
     </div>
     <div class="tier">
       <h3>Bring your service</h3>
       <div class="what">Onboarding onramp</div>
-      <p>Wrap a real service, get a run grant with per-run session keys so controller keys never
-      leave your machine, earn a receipt, and mirror your evidence bundle anywhere. It recovers
-      byte-identical from the content address.</p>
+      <p>You wrap a real service and get a run grant with a fresh session key for each run, so
+      your controller keys never leave your machine. A passing run earns a receipt, and you can
+      mirror the evidence bundle anywhere and recover it byte for byte.</p>
     </div>
   </div>
 </section>
@@ -508,7 +512,7 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
 <footer class="foot">
   <div class="sig">
     NANDA <strong>Town</strong>
-    <div class="motto">evidence over vibes · test the path</div>
+    <div class="motto">an open-source testbed for agent protocols</div>
   </div>
   <nav>
     <a href="https://github.com/projnanda/nandatown">Source</a>
@@ -524,15 +528,15 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
   var LAYERS = [
     ["transport", "How bytes move between agents"],
     ["communication", "Message shapes and conversations"],
-    ["identity", "Who an agent is, and can prove"],
+    ["identity", "How an agent proves who it is"],
     ["registry", "How agents find each other"],
     ["auth", "Who may do what"],
-    ["trust", "Who to believe, and how much"],
-    ["payments", "How value changes hands"],
+    ["trust", "How much to believe another agent"],
+    ["payments", "How agents pay each other"],
     ["coordination", "Turn-taking, leases, and locks"],
     ["negotiation", "Offers, counters, and deals"],
-    ["memory", "What the town remembers"],
-    ["privacy", "What never leaves the room"],
+    ["memory", "What state the town keeps"],
+    ["privacy", "Which fields get redacted"],
     ["data_facts", "Ground truth the sim checks against"]
   ];
 
@@ -581,7 +585,7 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
 
   var SCRIPT = [
     { cmd: "nandatown run marketplace" },
-    { out: '<span class="dim">lab · seed 1337 · 12 layers resolved · 6 agents joined</span>' },
+    { out: '<span class="dim">lab run  seed=1337  layers=12  agents=6</span>' },
     { out: '<span class="dim">tick 000..180  auction opened, 4 bids, deal closed, ledger settled</span>' },
     { out: "" },
     { out: PAD("  stage", 26) + "verdict" },
@@ -590,11 +594,11 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
     { out: PAD("  payment_conservation", 26) + '<span class="ok">PASSED</span>' },
     { out: PAD("  no_privacy_leak", 26) + '<span class="ok">PASSED</span>' },
     { out: "" },
-    { out: '<span class="dim">evidence bundle sealed · sha256:41be...9d20 · nandatown verify runs/...</span>' },
+    { out: '<span class="dim">evidence bundle sealed  sha256:41be...9d20  check it: nandatown verify runs/...</span>' },
     { pause: 2200 },
     { clear: true },
     { cmd: "nandatown test-agent --url https://seller.example.dev" },
-    { out: '<span class="dim">path profile a2a-capability-fulfillment@0.1 · live A2A agent</span>' },
+    { out: '<span class="dim">path profile a2a-capability-fulfillment@0.1  live A2A agent</span>' },
     { out: "" },
     { out: PAD("  resolution", 26) + '<span class="ok">PASSED</span>' },
     { out: PAD("  agent_card_retrieval", 26) + '<span class="ok">PASSED</span>' },
@@ -610,8 +614,8 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
     { cmd: "nandatown proof runs/2026-08-28T14-02-11_path" },
     { out: "" },
     { out: '  <span class="hl">TOWN-TESTED</span>  capability <b>quote</b> observed to pass' },
-    { out: '  <span class="dim">for release basis sha256:41be...9d20 · receipt signed did:town:9f31...c07a</span>' },
-    { out: '  <span class="dim">this claim is narrow and expiring · commitment is not truth</span>' },
+    { out: '  <span class="dim">for release basis sha256:41be...9d20  receipt signed did:town:9f31...c07a</span>' },
+    { out: '  <span class="dim">this claim is narrow, and it expires</span>' },
     { pause: 3000 },
     { clear: true }
   ];
