@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NANDA Town</title>
+<meta name="description" content="NANDA Town is the open-source proving ground for agent protocols. Test the path, not just the protocol: agents earn replayable evidence in a town that plants faults on purpose." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23F2C400'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial' font-size='34' font-weight='700' text-anchor='middle' fill='%230E0E0E'%3ENT%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.cdnfonts.com/css/neue-haas-grotesk-display-pro" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #FFFFFF;
+  --bg-2: #F6F6F4;
+  --ink: #0E0E0E;
+  --muted: #6b6258;
+  --rule: rgba(14,14,14,.14);
+  --rule-soft: rgba(14,14,14,.08);
+  --brand-yellow: #F2C400;
+  --brand-yellow-soft: rgba(242,196,0,.18);
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --term-bg: #101010;
+  --term-ink: #e8e6e1;
+  --sans: 'Neue Haas Grotesk Display Pro','Inter','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pad-x: clamp(20px, 5vw, 56px);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  min-height: 100vh;
+  background-image: radial-gradient(rgba(14,14,14,.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-attachment: fixed;
+}
+a { color: inherit; }
+code, pre { font-family: var(--mono); }
+::selection { background: var(--brand-yellow); color: var(--ink); }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px var(--pad-x);
+  border-bottom: 1px solid var(--rule);
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(6px);
+  position: sticky; top: 0; z-index: 20;
+  flex-wrap: wrap; gap: 12px;
+}
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.brand-link { text-decoration: none; font-size: 18px; letter-spacing: .02em; font-weight: 500; }
+.brand-link strong { background: var(--brand-yellow); padding: 2px 6px; border-radius: 3px; }
+.brand .tag { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.navlinks { display: flex; gap: 18px; font-size: 13px; flex-wrap: wrap; }
+.navlinks a { text-decoration: none; color: var(--muted); }
+.navlinks a:hover { color: var(--ink); }
+.navlinks a.gh { color: var(--ink); font-weight: 600; }
+
+main { padding: 0 var(--pad-x) 0; max-width: 1240px; margin: 0 auto; width: 100%; }
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 14px;
+}
+.kicker::before { content: ""; display: inline-block; width: 22px; height: 8px; background: var(--brand-yellow); margin-right: 10px; }
+
+.hero { padding: 72px 0 26px; }
+.hero h1 {
+  font-size: clamp(40px, 6.4vw, 78px);
+  line-height: 1.02; letter-spacing: -0.025em;
+  margin: 0 0 22px; max-width: 15ch; font-weight: 700;
+}
+.mark { position: relative; white-space: nowrap; }
+.mark::after {
+  content: ""; position: absolute; left: -2px; right: -2px; bottom: .06em;
+  height: .34em; background: var(--brand-yellow); z-index: -1;
+  transform: skew(-6deg) rotate(-.6deg);
+}
+.hero .lede { font-size: 19px; max-width: 62ch; color: #2a2a28; margin: 0 0 30px; }
+.hero .lede code { background: var(--bg-2); border: 1px solid var(--rule-soft); padding: 1px 6px; border-radius: 3px; font-size: .88em; }
+
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+.btn {
+  display: inline-block; text-decoration: none; font-size: 14px; font-weight: 600;
+  padding: 12px 22px; border-radius: 4px; border: 1px solid var(--ink);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn-solid { background: var(--ink); color: #fff; }
+.btn-solid:hover { background: #000; transform: translateY(-1px); box-shadow: 0 4px 0 var(--brand-yellow); }
+.btn-line { background: transparent; color: var(--ink); }
+.btn-line:hover { background: var(--brand-yellow-soft); transform: translateY(-1px); }
+.clone-chip {
+  font-family: var(--mono); font-size: 12.5px;
+  background: var(--bg-2); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 10px 14px;
+  display: inline-flex; gap: 12px; align-items: center; cursor: pointer;
+  transition: border-color .12s ease;
+}
+.clone-chip:hover { border-color: var(--ink); }
+.clone-chip .cp { color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 34px; }
+.stat { background: var(--bg-2); border: 1px solid var(--rule); padding: 18px 18px 16px; border-radius: 4px; }
+.stat .num { font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.stat .lbl { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+.ticker-wrap {
+  border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  overflow: hidden; margin: 44px calc(-1 * var(--pad-x)) 0; padding: 10px 0;
+  background: rgba(255,255,255,.7);
+}
+.ticker { display: flex; width: max-content; animation: tick 42s linear infinite; }
+.ticker span {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted); padding: 0 18px; white-space: nowrap;
+}
+.ticker span::after { content: "·"; margin-left: 36px; color: var(--brand-yellow); font-size: 16px; }
+@keyframes tick { to { transform: translateX(-50%); } }
+
+/* terminal */
+.term-section { padding: 56px 0 8px; }
+.term {
+  background: var(--term-bg); color: var(--term-ink);
+  border-radius: 6px; border: 1px solid #000;
+  box-shadow: 0 18px 50px rgba(14,14,14,.18), 0 6px 0 var(--brand-yellow);
+  overflow: hidden; max-width: 940px; margin: 0 auto;
+}
+.term-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,.09);
+  background: #161616;
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; background: #2c2c2c; }
+.dot.y { background: var(--brand-yellow); }
+.term-head .title { font-family: var(--mono); font-size: 11.5px; color: #9b968e; margin-left: 10px; letter-spacing: .08em; }
+.term-body {
+  font-family: var(--mono); font-size: 13px; line-height: 1.75;
+  padding: 20px 22px 24px; min-height: 380px; white-space: pre-wrap; overflow-x: auto;
+}
+.term-body .p { color: var(--brand-yellow); }
+.term-body .dim { color: #8a857c; }
+.term-body .ok { color: #4ade80; }
+.term-body .bad { color: #f87171; }
+.term-body .inc { color: #fbbf24; }
+.term-body .hl { background: var(--brand-yellow); color: var(--ink); padding: 0 5px; border-radius: 2px; font-weight: 700; }
+.cursor { display: inline-block; width: 8px; height: 15px; background: var(--term-ink); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+section.block { padding: 72px 0 8px; }
+.block h2 { font-size: clamp(28px, 3.6vw, 44px); letter-spacing: -0.02em; line-height: 1.08; margin: 0 0 14px; max-width: 24ch; }
+.block .sub { font-size: 16.5px; color: #2a2a28; max-width: 68ch; margin: 0 0 34px; }
+.block .sub code { background: var(--bg-2); border: 1px solid var(--rule-soft); padding: 1px 5px; border-radius: 3px; font-size: .88em; }
+
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.tier {
+  background: #fff; border: 1px solid var(--rule); border-radius: 4px;
+  padding: 24px 22px 22px; position: relative;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.tier:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(14,14,14,.10), inset 0 3px 0 var(--brand-yellow); }
+.tier .no { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .16em; }
+.tier h3 { font-size: 21px; margin: 8px 0 2px; letter-spacing: -0.01em; }
+.tier .what { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.tier p { font-size: 14.5px; color: #2a2a28; margin: 0 0 12px; }
+.tier code { background: var(--bg-2); border: 1px solid var(--rule-soft); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+.layer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.layer {
+  border: 1px solid var(--rule); background: #fff; border-radius: 4px; padding: 14px 16px;
+  transition: background .12s ease, border-color .12s ease;
+}
+.layer:hover { background: var(--brand-yellow-soft); border-color: var(--ink); }
+.layer .nm { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .04em; }
+.layer .ds { font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+.layer-note { font-size: 13.5px; color: var(--muted); margin-top: 16px; max-width: 70ch; }
+
+.verdicts { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 26px; }
+.pill {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+  padding: 7px 13px; border-radius: 999px; border: 1px solid var(--rule); background: #fff;
+}
+.pill.ok { color: var(--ok); border-color: rgba(21,128,61,.35); }
+.pill.bad { color: var(--bad); border-color: rgba(185,28,28,.35); }
+.pill.inc { color: var(--warn); border-color: rgba(180,83,9,.35); }
+.pill.na { color: var(--muted); }
+.pill.err { color: #fff; background: var(--ink); border-color: var(--ink); }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+@media (max-width: 880px) { .split { grid-template-columns: 1fr; } }
+.filetree {
+  font-family: var(--mono); font-size: 13px; line-height: 1.9;
+  background: var(--bg-2); border: 1px solid var(--rule); border-radius: 4px; padding: 20px 22px;
+}
+.filetree .d { color: var(--muted); }
+.filetree .f { font-weight: 500; }
+.filetree .c { color: var(--muted); font-size: 11.5px; }
+.prose p { font-size: 15.5px; color: #2a2a28; margin: 0 0 14px; }
+.prose p strong { font-weight: 700; }
+.prose code { background: var(--bg-2); border: 1px solid var(--rule-soft); padding: 1px 5px; border-radius: 3px; font-size: .88em; }
+
+.proof-card {
+  border: 2px solid var(--ink); border-radius: 4px; background: #fff;
+  padding: 26px 26px 22px; max-width: 560px;
+  box-shadow: 6px 6px 0 var(--brand-yellow);
+  font-family: var(--mono);
+}
+.proof-card .badge { display: inline-block; background: var(--ink); color: var(--brand-yellow); font-weight: 700; letter-spacing: .16em; font-size: 13px; padding: 6px 12px; border-radius: 3px; margin-bottom: 14px; }
+.proof-card .line { font-size: 12.5px; line-height: 1.9; }
+.proof-card .line .k { color: var(--muted); }
+.proof-card .fine { font-size: 11px; color: var(--muted); margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 12px; line-height: 1.7; }
+
+.steps { counter-reset: step; display: grid; gap: 12px; max-width: 860px; }
+.step {
+  border: 1px solid var(--rule); background: #fff; border-radius: 4px;
+  padding: 18px 20px 16px; display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
+}
+.step::before {
+  counter-increment: step; content: counter(step, decimal-leading-zero);
+  font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--muted);
+  border-right: 2px solid var(--brand-yellow); padding-right: 12px; line-height: 1.4;
+}
+.step h4 { margin: 0 0 6px; font-size: 15.5px; }
+.step p { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
+.codebox {
+  position: relative; background: var(--term-bg); color: var(--term-ink);
+  font-family: var(--mono); font-size: 12.5px; border-radius: 4px;
+  padding: 12px 90px 12px 16px; overflow-x: auto; white-space: pre;
+}
+.codebox .copy {
+  position: absolute; top: 8px; right: 8px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  background: transparent; color: #9b968e; border: 1px solid rgba(255,255,255,.22);
+  border-radius: 3px; padding: 4px 9px; cursor: pointer;
+}
+.codebox .copy:hover { color: var(--brand-yellow); border-color: var(--brand-yellow); }
+
+.bring { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+.foot {
+  margin-top: 90px; border-top: 1px solid var(--rule);
+  padding: 34px var(--pad-x) 46px;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  background: rgba(255,255,255,.7);
+}
+.foot .sig { font-size: 14px; }
+.foot .sig strong { background: var(--brand-yellow); padding: 1px 5px; border-radius: 3px; }
+.foot .sig .motto { color: var(--muted); font-size: 12.5px; margin-top: 6px; font-family: var(--mono); letter-spacing: .04em; }
+.foot nav { display: flex; gap: 20px; font-size: 13px; flex-wrap: wrap; }
+.foot nav a { color: var(--muted); text-decoration: none; }
+.foot nav a:hover { color: var(--ink); }
+
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.on { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .ticker { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="#" class="brand-link">NANDA <strong>Town</strong></a>
+    <span class="tag">Project NANDA · Agent Testbed</span>
+  </div>
+  <nav class="navlinks">
+    <a href="#tiers">Three rooms</a>
+    <a href="#layers">Twelve layers</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#proof">Proof</a>
+    <a href="#start">Get started</a>
+    <a class="gh" href="https://github.com/projnanda/nandatown">GitHub &nearr;</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <p class="kicker">Open-source proving ground for agent protocols</p>
+  <h1>Test the <span class="mark">path</span>, not just the protocol.</h1>
+  <p class="lede">
+    A protocol spec tells you what agents promised. NANDA Town watches what they actually do.
+    Drop any agent into a small town that plants faults on purpose: crashed sellers, duplicate
+    deliveries, drifting agent cards, truncated context. The agent either survives with
+    replayable evidence, or it fails in a way you can rerun with one command.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-solid" href="https://github.com/projnanda/nandatown">View on GitHub</a>
+    <a class="btn btn-line" href="https://nandatown.projectnanda.org">Visit the live town</a>
+    <span class="clone-chip" id="clone-chip" title="Click to copy">
+      <span class="cp" id="clone-cp">Copy</span>
+      <span>git clone https://github.com/projnanda/nandatown</span>
+    </span>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num">12</div><div class="lbl">Protocol layers</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl">Test tiers</div></div>
+    <div class="stat"><div class="num">7</div><div class="lbl">Lab scenarios</div></div>
+    <div class="stat"><div class="num">158</div><div class="lbl">Tests in CI</div></div>
+    <div class="stat"><div class="num">5</div><div class="lbl">Verdict states</div></div>
+  </div>
+</section>
+
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker" id="ticker"></div>
+</div>
+
+<section class="term-section reveal">
+  <div class="term">
+    <div class="term-head">
+      <span class="dot"></span><span class="dot"></span><span class="dot y"></span>
+      <span class="title">nandatown · interactive CLI</span>
+    </div>
+    <div class="term-body" id="term-body"></div>
+  </div>
+</section>
+
+<section class="block reveal" id="tiers">
+  <p class="kicker">Three rooms, one bar</p>
+  <h2>Every claim is tested where it can actually break.</h2>
+  <p class="sub">
+    Start deterministic, end live. The same evidence format and the same verdicts hold in
+    all three rooms, so a pass means the same thing wherever it was earned.
+  </p>
+  <div class="tiers">
+    <div class="tier">
+      <span class="no">01</span>
+      <h3>The Lab</h3>
+      <div class="what">Deterministic simulation</div>
+      <p>A seeded discrete-event sim of the whole town. Auctions, voting, consensus, supply
+      chains, capability spoofing. Same seed, same story, every time, so a regression is a
+      diff and not a debate.</p>
+      <p><code>nandatown run marketplace</code></p>
+    </div>
+    <div class="tier">
+      <span class="no">02</span>
+      <h3>The Track</h3>
+      <div class="what">Real processes, real failures</div>
+      <p>Actual subprocess agents talking over HTTP through a durable mailbox: leases,
+      fencing tokens, at-least-once delivery. The town kills a seller mid-run and checks
+      that the deal still closes exactly once.</p>
+      <p><code>nandatown run quote-crash-restart</code></p>
+    </div>
+    <div class="tier">
+      <span class="no">03</span>
+      <h3>The Path</h3>
+      <div class="what">Live agents on the open web</div>
+      <p>Point the town at any A2A agent by URL. It reads the agent card, invokes the
+      capability, replays the request to catch double-fulfillment, and grades against a
+      versioned path profile.</p>
+      <p><code>nandatown test-agent --url ...</code></p>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="layers">
+  <p class="kicker">The town is modular</p>
+  <h2>Twelve replaceable protocol layers.</h2>
+  <p class="sub">
+    Every interaction in the town passes through these layers. Each ships with a working
+    default plugin, and any scenario can swap any layer for a registered alternative.
+    Found a failure that fits no layer? Propose a thirteenth.
+  </p>
+  <div class="layer-grid" id="layer-grid"></div>
+  <p class="layer-note">
+    Plugins register with a one-line decorator and resolve by name at runtime, so testing a
+    new registry design or a different trust model is a plugin, not a fork.
+  </p>
+</section>
+
+<section class="block reveal" id="evidence">
+  <p class="kicker">Evidence over vibes</p>
+  <h2>Verdicts you can replay, not screenshots you must trust.</h2>
+  <div class="verdicts">
+    <span class="pill ok">PASSED</span>
+    <span class="pill bad">FAILED</span>
+    <span class="pill inc">INCONCLUSIVE</span>
+    <span class="pill na">NOT TESTED</span>
+    <span class="pill err">ERROR · the town's fault, never yours</span>
+  </div>
+  <div class="split">
+    <div class="prose">
+      <p>Every run writes a content-addressed <strong>evidence bundle</strong>. Validators judge
+      from recorded events alone, never from an agent's self-report. If evidence is missing the
+      verdict is Inconclusive, because absence of proof is not a pass.</p>
+      <p>When something breaks, the result names the <strong>first broken stage</strong>, marks
+      everything downstream as unreached instead of failed, and prints the exact command that
+      reruns that stage.</p>
+      <p>Anyone can check a bundle without trusting the person who sent it:
+      <code>nandatown verify &lt;bundle&gt;</code> recomputes every hash and re-judges every stage
+      from the raw events.</p>
+    </div>
+    <div class="filetree">
+<span class="d">runs/2026-08-28T14-02-11_marketplace/</span>
+├── <span class="f">profile.json</span>   <span class="c">what was claimed</span>
+├── <span class="f">run.json</span>       <span class="c">what the town did</span>
+├── <span class="f">intents.jsonl</span>  <span class="c">what agents tried</span>
+├── <span class="f">events.jsonl</span>   <span class="c">what actually happened</span>
+├── <span class="f">result.json</span>    <span class="c">stage-by-stage verdicts</span>
+└── <span class="f">manifest.json</span>  <span class="c">sha256 over all of it</span>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="proof">
+  <p class="kicker">A badge that expires</p>
+  <h2>TOWN-TESTED means something, briefly.</h2>
+  <p class="sub">
+    Passing runs mint an Ed25519-signed receipt, sanitized of business data. The badge renders
+    only while the evidence is fresh, the signature checks out, and the coverage is honest.
+    Commitment is not truth, so the proof stays narrow and expiring by design.
+  </p>
+  <div class="proof-card">
+    <span class="badge">TOWN-TESTED</span>
+    <div class="line"><span class="k">capability</span>   quote</div>
+    <div class="line"><span class="k">verdict</span>      passed</div>
+    <div class="line"><span class="k">profile</span>      a2a-capability-fulfillment@0.1</div>
+    <div class="line"><span class="k">observer</span>     did:town:9f31...c07a</div>
+    <div class="line"><span class="k">release</span>      sha256:41be...9d20</div>
+    <div class="fine">
+      This claim is narrow and expiring. It says one capability passed one profile at one
+      point in time, and nothing more. Verify the receipt yourself before believing it.
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="start">
+  <p class="kicker">Five minutes to first verdict</p>
+  <h2>Get started.</h2>
+  <div class="steps">
+    <div class="step">
+      <div>
+        <h4>Clone and install</h4>
+        <p>Python 3.11 or newer. Everything runs locally, no accounts, no cloud.</p>
+        <div class="codebox"><button class="copy">Copy</button>git clone https://github.com/projnanda/nandatown
+cd nandatown &amp;&amp; python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e ".[dev]"</div>
+      </div>
+    </div>
+    <div class="step">
+      <div>
+        <h4>Open the town</h4>
+        <p>An interactive GUI in your terminal, or add <code>--web</code> to serve it in a browser.</p>
+        <div class="codebox"><button class="copy">Copy</button>nandatown ui</div>
+      </div>
+    </div>
+    <div class="step">
+      <div>
+        <h4>Run a scenario, break an agent</h4>
+        <p>Watch the marketplace close deals, then crash the seller and watch it recover.</p>
+        <div class="codebox"><button class="copy">Copy</button>nandatown run marketplace
+nandatown run quote-crash-restart</div>
+      </div>
+    </div>
+    <div class="step">
+      <div>
+        <h4>Test a live agent</h4>
+        <p>Any A2A agent with an agent card. Try it against the town's own defective demo agent first.</p>
+        <div class="codebox"><button class="copy">Copy</button>nandatown a2a serve --defect wrong_total &amp;
+nandatown test-agent --url http://127.0.0.1:8710</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="bring">
+  <p class="kicker">Bring your own everything</p>
+  <h2>Made to be connected to.</h2>
+  <div class="bring">
+    <div class="tier">
+      <h3>Bring your agent</h3>
+      <div class="what">Any harness</div>
+      <p>Point the LLM harness at any OpenAI-compatible endpoint or a local Ollama model, or use
+      the deterministic MockBrain. The town injects context truncation and tool errors to see
+      what your agent does when the world misbehaves.</p>
+    </div>
+    <div class="tier">
+      <h3>Bring your protocol</h3>
+      <div class="what">Straight from a PR</div>
+      <p>Working on a NANDA protocol? <code>nandatown import-pr</code> pulls a pull request from
+      the nandatown repo, scans it, and registers it as a layer plugin so it can be exercised
+      against every scenario before it merges.</p>
+    </div>
+    <div class="tier">
+      <h3>Bring your service</h3>
+      <div class="what">Onboarding onramp</div>
+      <p>Wrap a real service, get a run grant with per-run session keys so controller keys never
+      leave your machine, earn a receipt, and mirror your evidence bundle anywhere. It recovers
+      byte-identical from the content address.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="sig">
+    NANDA <strong>Town</strong>
+    <div class="motto">evidence over vibes · test the path</div>
+  </div>
+  <nav>
+    <a href="https://github.com/projnanda/nandatown">Source</a>
+    <a href="https://nandatown.projectnanda.org">Live town</a>
+    <a href="https://github.com/projnanda/nandatown/blob/main/docs/architecture.md">Architecture</a>
+    <a href="https://github.com/projnanda/nandatown/blob/main/docs/operators.md">Operators guide</a>
+    <a href="https://projectnanda.org">Project NANDA</a>
+  </nav>
+</footer>
+
+<script>
+(function () {
+  var LAYERS = [
+    ["transport", "How bytes move between agents"],
+    ["communication", "Message shapes and conversations"],
+    ["identity", "Who an agent is, and can prove"],
+    ["registry", "How agents find each other"],
+    ["auth", "Who may do what"],
+    ["trust", "Who to believe, and how much"],
+    ["payments", "How value changes hands"],
+    ["coordination", "Turn-taking, leases, and locks"],
+    ["negotiation", "Offers, counters, and deals"],
+    ["memory", "What the town remembers"],
+    ["privacy", "What never leaves the room"],
+    ["data_facts", "Ground truth the sim checks against"]
+  ];
+
+  var grid = document.getElementById("layer-grid");
+  LAYERS.forEach(function (l) {
+    var d = document.createElement("div");
+    d.className = "layer";
+    d.innerHTML = '<div class="nm">' + l[0] + '</div><div class="ds">' + l[1] + '</div>';
+    grid.appendChild(d);
+  });
+
+  var ticker = document.getElementById("ticker");
+  var names = LAYERS.map(function (l) { return l[0]; });
+  var half = names.map(function (n) { return "<span>" + n + "</span>"; }).join("");
+  ticker.innerHTML = half + half;
+
+  var chip = document.getElementById("clone-chip");
+  chip.addEventListener("click", function () {
+    navigator.clipboard.writeText("git clone https://github.com/projnanda/nandatown").then(function () {
+      document.getElementById("clone-cp").textContent = "Copied";
+      setTimeout(function () { document.getElementById("clone-cp").textContent = "Copy"; }, 1600);
+    });
+  });
+
+  document.querySelectorAll(".codebox .copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.parentNode.textContent.replace(/^Copy/, "").trim();
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+      });
+    });
+  });
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+
+  /* terminal animation */
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var body = document.getElementById("term-body");
+  var PAD = function (s, n) { while (s.length < n) s += " "; return s; };
+
+  var SCRIPT = [
+    { cmd: "nandatown run marketplace" },
+    { out: '<span class="dim">lab · seed 1337 · 12 layers resolved · 6 agents joined</span>' },
+    { out: '<span class="dim">tick 000..180  auction opened, 4 bids, deal closed, ledger settled</span>' },
+    { out: "" },
+    { out: PAD("  stage", 26) + "verdict" },
+    { out: PAD("  liveness", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  single_winner", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  payment_conservation", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  no_privacy_leak", 26) + '<span class="ok">PASSED</span>' },
+    { out: "" },
+    { out: '<span class="dim">evidence bundle sealed · sha256:41be...9d20 · nandatown verify runs/...</span>' },
+    { pause: 2200 },
+    { clear: true },
+    { cmd: "nandatown test-agent --url https://seller.example.dev" },
+    { out: '<span class="dim">path profile a2a-capability-fulfillment@0.1 · live A2A agent</span>' },
+    { out: "" },
+    { out: PAD("  resolution", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  agent_card_retrieval", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  descriptor_consistency", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  protocol_invocation", 26) + '<span class="ok">PASSED</span>' },
+    { out: PAD("  semantic_result", 26) + '<span class="bad">FAILED</span>  <span class="dim">quoted total != unit_price * quantity</span>' },
+    { out: PAD("  duplicate_request", 26) + '<span class="dim">NOT REACHED</span>' },
+    { out: "" },
+    { out: 'first broken stage: <span class="bad">semantic_result</span>' },
+    { out: '<span class="dim">rerun just this stage:</span> nandatown test-agent --url ... --stage semantic_result' },
+    { pause: 2400 },
+    { clear: true },
+    { cmd: "nandatown proof runs/2026-08-28T14-02-11_path" },
+    { out: "" },
+    { out: '  <span class="hl">TOWN-TESTED</span>  capability <b>quote</b> observed to pass' },
+    { out: '  <span class="dim">for release basis sha256:41be...9d20 · receipt signed did:town:9f31...c07a</span>' },
+    { out: '  <span class="dim">this claim is narrow and expiring · commitment is not truth</span>' },
+    { pause: 3000 },
+    { clear: true }
+  ];
+
+  if (reduced) {
+    var html = "";
+    SCRIPT.forEach(function (s) {
+      if (s.cmd) html += '<span class="p">town$</span> ' + s.cmd + "\n";
+      else if (s.out !== undefined) html += s.out + "\n";
+      else if (s.clear) html += "\n";
+    });
+    body.innerHTML = html;
+    return;
+  }
+
+  var i = 0;
+  function step() {
+    var s = SCRIPT[i % SCRIPT.length];
+    i++;
+    if (s.clear) { body.innerHTML = ""; setTimeout(step, 300); return; }
+    if (s.pause) { setTimeout(step, s.pause); return; }
+    if (s.cmd) {
+      var line = document.createElement("div");
+      line.innerHTML = '<span class="p">town$</span> ';
+      var cur = document.createElement("span");
+      cur.className = "cursor";
+      body.appendChild(line);
+      line.appendChild(cur);
+      var j = 0;
+      (function typeChar() {
+        if (j < s.cmd.length) {
+          cur.insertAdjacentText("beforebegin", s.cmd.charAt(j));
+          j++;
+          setTimeout(typeChar, 26 + Math.floor(24 * ((j * 7) % 10) / 10));
+        } else {
+          cur.remove();
+          setTimeout(step, 320);
+        }
+      })();
+      return;
+    }
+    var out = document.createElement("div");
+    out.innerHTML = s.out === "" ? "&nbsp;" : s.out;
+    body.appendChild(out);
+    setTimeout(step, 90);
+  }
+  var termIO = new IntersectionObserver(function (entries) {
+    if (entries[0].isIntersecting) { termIO.disconnect(); step(); }
+  }, { threshold: 0.3 });
+  termIO.observe(body);
+})();
+</script>
+
+</body>
+</html>
