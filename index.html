@@ -202,6 +202,7 @@ section.block { padding: 72px 0 8px; }
 .filetree {
   font-family: var(--mono); font-size: 13px; line-height: 1.9;
   background: var(--bg-2); border: 1px solid var(--rule); border-radius: 4px; padding: 20px 22px;
+  white-space: pre; overflow-x: auto;
 }
 .filetree .d { color: var(--muted); }
 .filetree .f { font-weight: 500; }
@@ -231,6 +232,7 @@ section.block { padding: 72px 0 8px; }
   font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--muted);
   border-right: 2px solid var(--brand-yellow); padding-right: 12px; line-height: 1.4;
 }
+.step > div { min-width: 0; }
 .step h4 { margin: 0 0 6px; font-size: 15.5px; }
 .step p { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
 .codebox {
@@ -449,15 +451,13 @@ section.block { padding: 72px 0 8px; }
       <code>nandatown verify &lt;bundle&gt;</code> recomputes every hash and re-judges every
       stage from the raw events on the verifier's own machine.</p>
     </div>
-    <div class="filetree">
-<span class="d">runs/2026-08-28T14-02-11_marketplace/</span>
+    <div class="filetree"><span class="d">runs/2026-08-28T14-02-11_marketplace/</span>
 ├── <span class="f">profile.json</span>   <span class="c">what was claimed</span>
 ├── <span class="f">run.json</span>       <span class="c">what the town did</span>
 ├── <span class="f">intents.jsonl</span>  <span class="c">what agents tried</span>
 ├── <span class="f">events.jsonl</span>   <span class="c">what actually happened</span>
 ├── <span class="f">result.json</span>    <span class="c">stage-by-stage verdicts</span>
-└── <span class="f">manifest.json</span>  <span class="c">sha256 over all of it</span>
-    </div>
+└── <span class="f">manifest.json</span>  <span class="c">sha256 over all of it</span></div>
   </div>
 </section>
 
