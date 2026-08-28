@@ -225,7 +225,7 @@ section.block { padding: 72px 0 8px; }
   padding: 18px 20px 16px; display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
 }
 .step::before {
-  counter-increment: step; content: counter(step, decimal-leading-zero);
+  counter-increment: step; content: counter(step);
   font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--muted);
   border-right: 2px solid var(--brand-yellow); padding-right: 12px; line-height: 1.4;
 }
@@ -276,7 +276,7 @@ section.block { padding: 72px 0 8px; }
     <span class="tag">Project NANDA agent testbed</span>
   </div>
   <nav class="navlinks">
-    <a href="#tiers">Three rooms</a>
+    <a href="#tiers">Three tiers</a>
     <a href="#layers">Twelve layers</a>
     <a href="#evidence">Evidence</a>
     <a href="#proof">Proof</a>
@@ -291,11 +291,12 @@ section.block { padding: 72px 0 8px; }
   <p class="kicker">An open-source testbed for agent protocols</p>
   <h1>Test the <span class="mark">path</span>, not just the protocol.</h1>
   <p class="lede">
-    A protocol spec says what an agent should do. NANDA Town records what the agent actually
-    does. You drop an agent into a small simulated town, and the town creates failures on
-    purpose, e.g., a crashed seller, a duplicate delivery, a changed agent card, or a truncated
-    context. Every run writes evidence you can replay, and every failure prints the exact
-    command that reruns it.
+    A protocol spec says what an agent should do, but NANDA Town records what the agent
+    actually does when things go wrong. You drop any agent into a small simulated town where
+    sellers crash mid-deal, deliveries arrive twice, agent cards drift out of sync with
+    reality, and context gets truncated, all planted deliberately by the town itself. Every
+    run writes evidence you can replay on your own machine, and every failure comes with the
+    exact command that reruns just the broken part.
   </p>
   <div class="cta-row">
     <a class="btn btn-solid" href="https://github.com/projnanda/nandatown">View on GitHub</a>
@@ -332,35 +333,40 @@ section.block { padding: 72px 0 8px; }
   <p class="kicker">Three test tiers</p>
   <h2>The same test runs at three levels of realism.</h2>
   <p class="sub">
-    Runs start deterministic and end live. Every tier uses the same evidence format and the
-    same verdicts, so a pass means the same thing at every tier.
+    Testing starts in a fully deterministic simulation and ends against live agents on the
+    open web, and every tier along the way writes the same evidence format and uses the same
+    five verdicts, so a pass means the same thing wherever it was earned.
   </p>
   <div class="tiers">
     <div class="tier">
-      <span class="no">01</span>
+      <span class="no">1</span>
       <h3>The Lab</h3>
       <div class="what">Deterministic simulation</div>
-      <p>A seeded simulation of the whole town covers auctions, voting, consensus, supply
-      chains, and capability spoofing. The same seed produces the same run every time, so
-      you can find a regression by diffing two runs.</p>
+      <p>A seeded discrete-event simulation of the whole town runs auctions, voting rounds,
+      consensus protocols, supply chains, and capability spoofing attacks entirely in memory.
+      Because the same seed always produces the same run down to the last event, you can find
+      a regression by diffing two runs instead of arguing about what probably happened.</p>
       <p><code>nandatown run marketplace</code></p>
     </div>
     <div class="tier">
-      <span class="no">02</span>
+      <span class="no">2</span>
       <h3>The Track</h3>
       <div class="what">Real processes and crashes</div>
-      <p>Real agent processes talk over HTTP through a durable mailbox with leases, fencing
-      tokens, and at-least-once delivery. The town kills a seller mid-run and checks that
-      the deal still closes exactly once.</p>
+      <p>Real agent processes talk to each other over HTTP through a durable mailbox built on
+      leases, fencing tokens, and at-least-once delivery, the same machinery that keeps
+      production distributed systems honest. The town kills a seller process in the middle of
+      a negotiation and then checks that the deal still closes exactly once after the
+      restart.</p>
       <p><code>nandatown run quote-crash-restart</code></p>
     </div>
     <div class="tier">
-      <span class="no">03</span>
+      <span class="no">3</span>
       <h3>The Path</h3>
       <div class="what">Live agents by URL</div>
-      <p>You point the town at any A2A agent by URL. The town reads the agent card and
-      invokes the capability. It then repeats the request to check that the agent does not
-      fulfill the order twice, and it grades everything against a versioned path profile.</p>
+      <p>You point the town at any live A2A agent by URL, and it reads the agent card,
+      invokes the advertised capability, and then repeats the same request to check that the
+      agent does not fulfill the order twice. Everything gets graded against a versioned path
+      profile, so a pass means the same thing no matter who ran the test or when.</p>
       <p><code>nandatown test-agent --url ...</code></p>
     </div>
   </div>
@@ -370,9 +376,10 @@ section.block { padding: 72px 0 8px; }
   <p class="kicker">The town is modular</p>
   <h2>Twelve replaceable protocol layers.</h2>
   <p class="sub">
-    Every interaction in the town passes through these layers. Each layer ships with a
-    working default plugin, and any scenario can swap any layer for a registered
-    alternative. If you find a failure that fits no layer, you can propose a new layer.
+    Every interaction in the town passes through these twelve layers, and each one ships
+    with a working default plugin that any scenario can swap for a registered alternative.
+    If you find a failure that fits no existing layer, you can propose a new one and the
+    town will exercise it against every scenario like the rest.
   </p>
   <div class="layer-grid" id="layer-grid"></div>
   <p class="layer-note">
@@ -394,16 +401,17 @@ section.block { padding: 72px 0 8px; }
   </div>
   <div class="split">
     <div class="prose">
-      <p>Every run writes an <strong>evidence bundle</strong>, and a manifest stores a hash of
-      every file, so any edit to the evidence is detectable. Validators judge from recorded
-      events alone, never from an agent's self-report. If evidence is missing, the verdict is
-      Inconclusive, because missing evidence is not a pass.</p>
-      <p>When something breaks, the result names the <strong>first broken stage</strong> and
-      marks everything after it as unreached instead of failed. The result also prints the
-      exact command that reruns the broken stage.</p>
-      <p>Anyone can check a bundle without trusting the person who sent it. The command
+      <p>Every run writes an <strong>evidence bundle</strong> whose manifest stores a sha256
+      hash of every file, so any tampering with the record is detectable by anyone who holds
+      a copy. Validators reach their verdicts from the recorded events alone and never from
+      an agent's self-report, and when the events are not enough to decide, the verdict is
+      Inconclusive rather than a pass, because missing evidence is not proof of anything.</p>
+      <p>When something breaks, the result names the <strong>first broken stage</strong>,
+      marks everything after it as unreached rather than failed so that one bug does not
+      read as ten, and prints the exact command that reruns the broken stage on its own.</p>
+      <p>Anyone can check a bundle without trusting the person who sent it, because
       <code>nandatown verify &lt;bundle&gt;</code> recomputes every hash and re-judges every
-      stage from the raw events.</p>
+      stage from the raw events on the verifier's own machine.</p>
     </div>
     <div class="filetree">
 <span class="d">runs/2026-08-28T14-02-11_marketplace/</span>
@@ -421,10 +429,11 @@ section.block { padding: 72px 0 8px; }
   <p class="kicker">A badge that expires</p>
   <h2>The TOWN-TESTED badge is narrow, and it expires.</h2>
   <p class="sub">
-    A passing run produces a receipt signed with an Ed25519 key, with business data removed.
-    The badge renders only while the evidence is fresh, the signature verifies, and the
-    coverage list is complete. The badge claims that one capability passed one profile at
-    one point in time, and nothing more.
+    A passing run produces a receipt signed with an Ed25519 key and stripped of business
+    data like prices and order contents, and the badge renders only while the evidence is
+    fresh, the signature verifies, and the coverage list is complete. The claim itself stays
+    deliberately small, saying only that one capability passed one profile at one point in
+    time.
   </p>
   <div class="proof-card">
     <span class="badge">TOWN-TESTED</span>
@@ -434,8 +443,9 @@ section.block { padding: 72px 0 8px; }
     <div class="line"><span class="k">observer</span>     did:town:9f31...c07a</div>
     <div class="line"><span class="k">release</span>      sha256:41be...9d20</div>
     <div class="fine">
-      This claim is narrow and expiring. It says one capability passed one profile at one
-      point in time, and nothing more. Verify the receipt yourself before believing it.
+      This claim is narrow and expiring by design, saying only that one capability passed
+      one profile at one point in time. Verify the receipt yourself before believing it,
+      because the whole point is that you never have to take anyone's word.
     </div>
   </div>
 </section>
@@ -447,7 +457,7 @@ section.block { padding: 72px 0 8px; }
     <div class="step">
       <div>
         <h4>Clone and install</h4>
-        <p>You need Python 3.11 or newer. Everything runs locally, and there are no accounts.</p>
+        <p>You need Python 3.11 or newer, and everything runs locally on your machine with no accounts and no cloud dependencies.</p>
         <div class="codebox"><button class="copy">Copy</button>git clone https://github.com/projnanda/nandatown
 cd nandatown &amp;&amp; python -m venv .venv &amp;&amp; source .venv/bin/activate
 pip install -e ".[dev]"</div>
@@ -456,14 +466,14 @@ pip install -e ".[dev]"</div>
     <div class="step">
       <div>
         <h4>Open the town</h4>
-        <p>The command opens an interactive GUI in your terminal. Add <code>--web</code> to serve the same GUI in a browser.</p>
+        <p>The command opens an interactive GUI right in your terminal, and adding <code>--web</code> serves the same interface in a browser instead.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown ui</div>
       </div>
     </div>
     <div class="step">
       <div>
         <h4>Run the scenarios</h4>
-        <p>The first run closes marketplace deals. The second crashes the seller mid-deal and checks the recovery.</p>
+        <p>The first command runs a full marketplace where deals open, get bid on, and close, and the second deliberately crashes the seller mid-deal to check that the deal still completes exactly once after recovery.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown run marketplace
 nandatown run quote-crash-restart</div>
       </div>
@@ -471,7 +481,7 @@ nandatown run quote-crash-restart</div>
     <div class="step">
       <div>
         <h4>Test a live agent</h4>
-        <p>The command tests any A2A agent that serves an agent card. You can try it first against the town's own demo agent, which has a planted defect.</p>
+        <p>The command tests any A2A agent that serves an agent card, and you can try it first against the town's own demo agent, which ships with a planted defect so you can watch a failure get caught.</p>
         <div class="codebox"><button class="copy">Copy</button>nandatown a2a serve --defect wrong_total &amp;
 nandatown test-agent --url http://127.0.0.1:8710</div>
       </div>
@@ -487,22 +497,24 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
       <h3>Bring your agent</h3>
       <div class="what">Any harness</div>
       <p>You point the LLM harness at any OpenAI-compatible endpoint or a local Ollama model,
-      or you use the deterministic MockBrain. The town injects context truncation and tool
-      errors to see what your agent does when a tool call fails or its context gets cut.</p>
+      or you use the deterministic MockBrain when you want reproducible runs. The town then
+      injects context truncation and tool errors mid-run to see what your agent actually does
+      when a tool call fails or its context gets cut.</p>
     </div>
     <div class="tier">
       <h3>Bring your protocol</h3>
       <div class="what">Straight from a PR</div>
-      <p>The command <code>nandatown import-pr</code> pulls a pull request from the nandatown
-      repo, scans it for secrets, and registers it as a layer plugin. Every scenario can then
-      exercise the protocol before it merges.</p>
+      <p>The command <code>nandatown import-pr</code> pulls a pull request straight from the
+      nandatown repo, scans it for secrets, and registers it as a layer plugin, so every
+      scenario in the town can exercise your protocol before it ever merges.</p>
     </div>
     <div class="tier">
       <h3>Bring your service</h3>
       <div class="what">Onboarding onramp</div>
-      <p>You wrap a real service and get a run grant with a fresh session key for each run, so
-      your controller keys never leave your machine. A passing run earns a receipt, and you can
-      mirror the evidence bundle anywhere and recover it byte for byte.</p>
+      <p>You wrap a real service and get a run grant that issues a fresh session key for each
+      run, so your controller keys never leave your machine. A passing run earns a signed
+      receipt, and you can mirror the evidence bundle to any host and recover it byte for
+      byte from its content address.</p>
     </div>
   </div>
 </section>
