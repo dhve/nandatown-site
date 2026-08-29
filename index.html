@@ -263,6 +263,37 @@ section.block { padding: 72px 0 8px; }
 .foot nav a { color: var(--muted); text-decoration: none; }
 .foot nav a:hover { color: var(--ink); }
 
+.video-frame {
+  max-width: 940px; margin: 0 auto; border-radius: 6px;
+  border: 2px solid var(--ink); overflow: hidden; background: #000;
+  box-shadow: 0 18px 50px rgba(14,14,14,.18), 0 6px 0 var(--brand-yellow);
+}
+.video-frame video { display: block; width: 100%; height: auto; }
+
+.viz-wrap { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: 18px; }
+#town-viz { display: block; width: 100%; height: 300px; }
+.viz-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.viz-stat {
+  font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  background: var(--bg-2); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 8px 12px;
+}
+.viz-stat b { font-size: 15px; color: var(--ink); }
+
+.pipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.pipe .st { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; font-family: var(--mono); }
+.pipe .st .nm { display: block; color: var(--muted); font-size: 11px; letter-spacing: .06em; margin-bottom: 6px; }
+.pipe .st .vd { font-weight: 700; font-size: 12.5px; }
+.pipe .vd.g { color: var(--ok); } .pipe .vd.b { color: var(--bad); }
+.pipe .vd.d { color: var(--muted); font-weight: 400; }
+.pipe-banner {
+  margin-top: 14px; background: var(--term-bg); color: var(--term-ink);
+  border-radius: 4px; padding: 14px 18px; font-family: var(--mono);
+  font-size: 13px; line-height: 1.7; min-height: 52px;
+}
+.pipe-banner .p { color: var(--brand-yellow); }
+.pipe-banner .bad { color: #f87171; } .pipe-banner .good { color: #4ade80; }
+
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.on { opacity: 1; transform: none; }
 
@@ -292,6 +323,10 @@ section.block { padding: 72px 0 8px; }
   .layer .nm { font-size: 12px; }
   .layer .ds { font-size: 11.5px; }
   .filetree { font-size: 11.5px; line-height: 1.8; padding: 14px; overflow-x: auto; }
+  #town-viz { height: 220px; }
+  .viz-stat { font-size: 11px; }
+  .pipe { grid-template-columns: 1fr 1fr; }
+  .pipe-banner { font-size: 11.5px; }
   .proof-card { padding: 18px 16px 16px; box-shadow: 4px 4px 0 var(--brand-yellow); }
   .proof-card .line { font-size: 11.5px; overflow-wrap: anywhere; }
   .step { grid-template-columns: 34px 1fr; gap: 12px; padding: 14px 14px 12px; }
@@ -314,6 +349,7 @@ section.block { padding: 72px 0 8px; }
     <span class="tag">Project NANDA agent testbed</span>
   </div>
   <nav class="navlinks">
+    <a href="#video">Video</a>
     <a href="#tiers">Three tiers</a>
     <a href="#layers">Twelve layers</a>
     <a href="#evidence">Evidence</a>
@@ -367,6 +403,20 @@ section.block { padding: 72px 0 8px; }
   </div>
 </section>
 
+<section class="block reveal" id="video">
+  <p class="kicker">The full tour</p>
+  <h2>Watch the explainer.</h2>
+  <p class="sub">
+    Seven minutes over the whole town: the three tiers, the twelve layers, the evidence
+    bundles, and the TOWN-TESTED badge.
+  </p>
+  <div class="video-frame">
+    <video controls preload="metadata" poster="explainer-poster.jpg">
+      <source src="https://github.com/dhve/nanda.town-site/releases/download/media/explainer.mp4" type="video/mp4" />
+    </video>
+  </div>
+</section>
+
 <section class="block reveal" id="tiers">
   <p class="kicker">Three test tiers</p>
   <h2>The same test runs at three levels of realism.</h2>
@@ -406,6 +456,24 @@ section.block { padding: 72px 0 8px; }
       agent does not fulfill the order twice. Everything gets graded against a versioned path
       profile, so a pass means the same thing no matter who ran the test or when.</p>
       <p><code>nandatown test-agent --url ...</code></p>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="townviz">
+  <p class="kicker">The town, live</p>
+  <h2>A small run, drawn while it happens.</h2>
+  <p class="sub">
+    A message travels from the buyer through the coordinator to the seller. Every third
+    deal, the seller crashes on purpose, its lease drains, and the town redelivers, so the
+    deal still closes exactly once. The counters keep score.
+  </p>
+  <div class="viz-wrap">
+    <canvas id="town-viz"></canvas>
+    <div class="viz-stats">
+      <span class="viz-stat">deals closed <b id="vz-deals">0</b></span>
+      <span class="viz-stat">crashes survived <b id="vz-crashes">0</b></span>
+      <span class="viz-stat">duplicates rejected <b id="vz-dupes">0</b></span>
     </div>
   </div>
 </section>
@@ -459,6 +527,18 @@ section.block { padding: 72px 0 8px; }
 ├── <span class="f">result.json</span>    <span class="c">stage-by-stage verdicts</span>
 └── <span class="f">manifest.json</span>  <span class="c">sha256 over all of it</span></div>
   </div>
+</section>
+
+<section class="block reveal" id="pipeline">
+  <p class="kicker">Stage by stage</p>
+  <h2>How a failing run reads.</h2>
+  <p class="sub">
+    The town judges every stage in order. When one stage fails, the stages after it show
+    as not reached instead of failed, and the report prints the exact command that reruns
+    the broken stage.
+  </p>
+  <div class="pipe" id="pipe"></div>
+  <div class="pipe-banner" id="pipe-banner">&nbsp;</div>
 </section>
 
 <section class="block reveal" id="proof">
@@ -625,6 +705,182 @@ nandatown test-agent --url http://127.0.0.1:8710</div>
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+
+  /* town visualizer */
+  (function () {
+    var cv = document.getElementById("town-viz");
+    if (!cv) return;
+    var ctx = cv.getContext("2d");
+    var SANS = "'Neue Haas Grotesk Display Pro','Helvetica Neue',Helvetica,Arial,sans-serif";
+    var MONO = "'JetBrains Mono',Menlo,monospace";
+    var deals = 0, crashes = 0, dupes = 0, cycle = 0;
+    var $d = document.getElementById("vz-deals"),
+        $c = document.getElementById("vz-crashes"),
+        $u = document.getElementById("vz-dupes");
+    var reducedViz = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var running = false, t0 = null;
+    function size() {
+      var w = cv.clientWidth, h = cv.clientHeight, r = window.devicePixelRatio || 1;
+      if (cv.width !== w * r) { cv.width = w * r; cv.height = h * r; }
+      ctx.setTransform(r, 0, 0, r, 0, 0);
+      return { w: w, h: h };
+    }
+    function box(x, y, w, h, label, sub, opts) {
+      opts = opts || {};
+      if (opts.shadow) { ctx.fillStyle = "#F2C400"; ctx.fillRect(x + 5, y + 5, w, h); }
+      ctx.fillStyle = opts.dead ? "#f3f1ec" : "#ffffff";
+      ctx.strokeStyle = opts.strong ? "#0E0E0E" : "rgba(14,14,14,.28)";
+      ctx.lineWidth = opts.strong ? 2 : 1;
+      ctx.fillRect(x, y, w, h); ctx.strokeRect(x, y, w, h);
+      ctx.textAlign = "center";
+      ctx.fillStyle = opts.dead ? "#b3ada3" : "#0E0E0E";
+      ctx.font = "600 15px " + SANS;
+      ctx.fillText(label, x + w / 2, y + h / 2 - 2);
+      ctx.fillStyle = opts.dead ? "#c9c4bb" : "#6b6258";
+      ctx.font = "11px " + MONO;
+      ctx.fillText(sub, x + w / 2, y + h / 2 + 16);
+      if (opts.dead) {
+        ctx.strokeStyle = "#b91c1c"; ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x + w - 26, y + 10); ctx.lineTo(x + w - 10, y + 26);
+        ctx.moveTo(x + w - 10, y + 10); ctx.lineTo(x + w - 26, y + 26);
+        ctx.stroke();
+      }
+    }
+    function dot(x, y) {
+      ctx.fillStyle = "#F2C400"; ctx.strokeStyle = "#0E0E0E"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, 7, 0, 6.283); ctx.fill(); ctx.stroke();
+    }
+    function PP(t, a, b) { return Math.max(0, Math.min(1, (t - a) / (b - a))); }
+    function lerp(a, b, p) { return a + (b - a) * p; }
+    function draw(t, crash) {
+      var s = size(), w = s.w, h = s.h;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(14,14,14,.06)";
+      for (var gx = 14; gx < w; gx += 34)
+        for (var gy = 14; gy < h; gy += 34) ctx.fillRect(gx, gy, 2, 2);
+      var bw = Math.min(180, w * 0.26), bh = 74;
+      var y = h / 2 - bh / 2 - 16;
+      var bx = w * 0.05, cx = w / 2 - bw / 2, sx = w * 0.95 - bw;
+      var midY = y + bh / 2;
+      var dead = crash && t > 2.6 && t < 6.2;
+      box(bx, y, bw, bh, "buyer", "sends q-1");
+      box(cx, y, bw, bh, "coordinator", "mailbox, leases", { strong: true, shadow: true });
+      box(sx, y, bw, bh, "seller", "applies once", { dead: dead });
+      var cap = "";
+      if (t < 0.9) { dot(lerp(bx + bw, cx, PP(t, 0, 0.9)), midY); cap = "the buyer sends the request"; }
+      else if (t < 1.8) { dot(lerp(cx + bw, sx, PP(t, 0.9, 1.8)), midY); cap = "the coordinator delivers under a lease"; }
+      else if (!crash) {
+        if (t < 2.6) cap = "the seller applies the task once";
+        else if (t < 3.5) { dot(lerp(sx, cx + bw, PP(t, 2.6, 3.5)), midY); cap = "the seller replies"; }
+        else if (t < 4.4) { dot(lerp(cx, bx + bw, PP(t, 3.5, 4.4)), midY); cap = "the buyer checks the total itself"; }
+        else cap = "deal closed exactly once";
+      } else {
+        if (t < 2.6) cap = "the seller claims the work";
+        else if (t < 4.4) {
+          cap = "the seller crashes; the lease drains";
+          var lw = bw * (1 - PP(t, 2.6, 4.4));
+          ctx.fillStyle = "#e8e5df"; ctx.fillRect(sx, y + bh + 10, bw, 8);
+          ctx.fillStyle = "#F2C400"; ctx.fillRect(sx, y + bh + 10, lw, 8);
+          ctx.strokeStyle = "rgba(14,14,14,.25)"; ctx.strokeRect(sx, y + bh + 10, bw, 8);
+        }
+        else if (t < 5.0) cap = "the stale fence is rejected";
+        else if (t < 5.9) { dot(lerp(cx + bw, sx, PP(t, 5.0, 5.9)), midY); cap = "the town redelivers"; }
+        else if (t < 6.6) cap = "the journal rejects the duplicate";
+        else if (t < 7.5) { dot(lerp(sx, cx + bw, PP(t, 6.6, 7.5)), midY); cap = "the restarted seller replies"; }
+        else if (t < 8.4) { dot(lerp(cx, bx + bw, PP(t, 7.5, 8.4)), midY); cap = "the buyer checks the total itself"; }
+        else cap = "deal closed exactly once";
+      }
+      ctx.fillStyle = "#0E0E0E"; ctx.textAlign = "center";
+      ctx.font = "15px " + SANS;
+      ctx.fillText(cap, w / 2, h - 16);
+    }
+    function frame(now) {
+      if (!running) return;
+      if (t0 === null) t0 = now;
+      var t = (now - t0) / 1000;
+      var crash = cycle % 3 === 2;
+      var DUR = crash ? 9.0 : 5.2;
+      draw(t, crash);
+      if (t >= DUR) {
+        deals++; $d.textContent = deals;
+        if (crash) { crashes++; dupes++; $c.textContent = crashes; $u.textContent = dupes; }
+        cycle++; t0 = now;
+      }
+      requestAnimationFrame(frame);
+    }
+    if (reducedViz) {
+      draw(9.0, true);
+      $d.textContent = "3"; $c.textContent = "1"; $u.textContent = "1";
+    } else {
+      var vio = new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) {
+          if (!running) { running = true; t0 = null; requestAnimationFrame(frame); }
+        } else { running = false; t0 = null; }
+      }, { threshold: 0.2 });
+      vio.observe(cv);
+    }
+  })();
+
+  /* stage pipeline visualizer */
+  (function () {
+    var wrap = document.getElementById("pipe");
+    if (!wrap) return;
+    var NAMES = ["resolution", "agent card", "descriptor", "invocation", "semantic result", "duplicate request"];
+    var els = NAMES.map(function (n) {
+      var d = document.createElement("div"); d.className = "st";
+      d.innerHTML = '<span class="nm">' + n + '</span><span class="vd d">WAITING</span>';
+      wrap.appendChild(d); return d;
+    });
+    var banner = document.getElementById("pipe-banner");
+    var reducedPipe = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var FAILHTML = '<span class="bad">first broken stage: semantic_result</span><br>' +
+      '<span class="p">$</span> nandatown test-agent --url ... --stage semantic_result';
+    function setSt(i, txt, cls) {
+      var v = els[i].querySelector(".vd");
+      v.textContent = txt; v.className = "vd " + cls;
+    }
+    function resetAll() {
+      els.forEach(function (e, i) { setSt(i, "WAITING", "d"); });
+      banner.innerHTML = "&nbsp;";
+    }
+    if (reducedPipe) {
+      for (var i = 0; i < 4; i++) setSt(i, "PASS", "g");
+      setSt(4, "FAIL", "b"); setSt(5, "NOT REACHED", "d");
+      banner.innerHTML = FAILHTML;
+      return;
+    }
+    var run = 0, timer = null, visible = false;
+    function doRun() {
+      if (!visible) return;
+      resetAll();
+      var fail = run % 3 === 2 ? 4 : -1;
+      var i = 0;
+      function step() {
+        if (!visible) return;
+        if (i === fail) {
+          setSt(i, "FAIL", "b");
+          for (var j = i + 1; j < 6; j++) setSt(j, "NOT REACHED", "d");
+          banner.innerHTML = FAILHTML;
+          run++; timer = setTimeout(doRun, 3600); return;
+        }
+        if (i < 6) {
+          setSt(i, "PASS", "g"); i++;
+          timer = setTimeout(step, 420);
+        } else {
+          banner.innerHTML = '<span class="good">all stages passed</span>  evidence bundle sealed';
+          run++; timer = setTimeout(doRun, 2600);
+        }
+      }
+      step();
+    }
+    var pio = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) {
+        if (!visible) { visible = true; doRun(); }
+      } else { visible = false; clearTimeout(timer); }
+    }, { threshold: 0.25 });
+    pio.observe(wrap);
+  })();
 
   /* terminal animation */
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
